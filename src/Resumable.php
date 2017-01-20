@@ -179,7 +179,7 @@ class Resumable
 
         if (!$this->isChunkUploaded($identifier, $filename, $chunkNumber)) {
             $chunkFile = $this->tmpChunkDir($identifier) . DIRECTORY_SEPARATOR . $this->tmpChunkFilename($filename, $chunkNumber);
-            $this->moveUploadedFile($file['tmp_name'], $chunkFile);
+            $this->moveUploadedFile($file->getPathname(), $chunkFile);
         }
 
         if ($this->isFileUploadComplete($filename, $identifier, $chunkSize, $totalSize)) {
@@ -227,11 +227,13 @@ class Resumable
     public function resumableParams()
     {
         if ($this->request->is('get')) {
-            return $this->request->data('get');
+            $params = $this->request->data('get');
         }
         if ($this->request->is('post')) {
-            return $this->request->data('post');
+	        $params = $this->request->data('post');
         }
+
+        return $params;
     }
 
     public function isFileUploadComplete($filename, $identifier, $chunkSize, $totalSize)
@@ -240,7 +242,7 @@ class Resumable
             return false;
         }
         $numOfChunks = intval($totalSize / $chunkSize) + ($totalSize % $chunkSize == 0 ? 0 : 1);
-        for ($i = 1; $i < $numOfChunks; $i++) {
+        for ($i = 1; $i <= $numOfChunks; $i++) {
             if (!$this->isChunkUploaded($identifier, $filename, $i)) {
                 return false;
             }

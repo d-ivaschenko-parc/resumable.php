@@ -18,7 +18,7 @@ class LaravelRequest implements Request
 	 */
 	public function is($type)
 	{
-		return $this->request->method() == $type;
+		return strtolower($this->request->method()) == $type;
 	}
 
 	/**
@@ -35,11 +35,14 @@ class LaravelRequest implements Request
 	 */
 	public function file()
 	{
-		if (empty($this->request->files)) {
+		if (empty($this->request->allFiles())) {
 			return [];
 		}
 
-		return array_shift($this->request->files);
+		$allFiles = $this->request->allFiles();
+		$first = array_shift($allFiles);
+
+		return $first;
 	}
 
 }
